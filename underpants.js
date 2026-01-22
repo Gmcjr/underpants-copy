@@ -21,6 +21,9 @@ var _ = {};
 *   _.identity({a: "b"}) === {a: "b"}
 */
 
+_.identity = function(value){
+    return value;
+};
 
 /** _.typeOf
 * Arguments:
@@ -41,7 +44,17 @@ var _ = {};
 * _.typeOf("javascript") -> "string"
 * _.typeOf([1,2,3]) -> "array"
 */
+_.typeOf = function(value){
+// function takes in a value and returns its type as a string
+var return_value = Object.prototype.toString.call(value);
+   
+var type = return_value.substring(
+         return_value.indexOf(" ") + 1, 
+         return_value.indexOf("]"));
 
+return type.toLowerCase();
+
+};
 
 /** _.first
 * Arguments:
@@ -61,6 +74,19 @@ var _ = {};
 *   _.first(["a", "b", "c"], 2) -> ["a", "b"]
 */
 
+_.first = function(array, number){
+    if (!number) {
+        return array[0];
+    } else if (number < 0 || !Array.isArray(array)) {
+        return [];
+    } else if (number > array.length) {
+        return array;
+    } else if (number) {
+       let newArray = array.slice(0, number);
+        return newArray;
+        }
+    
+}
 
 /** _.last
 * Arguments:
@@ -79,7 +105,27 @@ var _ = {};
 *   _.last(["a", "b", "c"], 1) -> "c"
 *   _.last(["a", "b", "c"], 2) -> ["b", "c"]
 */
+// I: function takes an array and a number
+// O: if Array.isArray(array) === false, return [];
+// if (!number) or NaN, return only the last element in the array
+// otherwise, return the last <number> items of <array>
+// E: account for number being negative or greater than array.length
 
+_.last = function(array, number) {
+    var output = [];
+    if (!Array.isArray(array) || number < 0) {
+        return output;
+      } else if (number == null) { 
+          output = array[array.length - 1];
+          return output;
+      } else if (number > array.length) {
+          output.push(array);
+        return array;
+      } else if (Array.isArray(array) && number === number) {
+          output = array.slice(array.length - number, array.length);
+          return output;
+      }
+    }
 
 /** _.indexOf
 * Arguments:
@@ -96,6 +142,26 @@ var _ = {};
 *   _.indexOf(["a","b","c"], "c") -> 2
 *   _.indexOf(["a","b","c"], "d") -> -1
 */
+// I: function takes an array and a value as inputs
+// O: function returns a number
+// C: if value occurs in array, return index of its first occurance
+// if value == null, return -1
+// do not use .indexOf()
+// E: covered in C. what if array has multiple occurances of value?
+// (it only wants the first occurance returned)
+// what if value isn't in array? return -1
+
+_.indexOf = function(array, value) {
+// iterate through the array to see if an element matches <value>
+    for (let i = 0; i < array.length; i++) {
+ // if value occurs in index, return index of first occurance
+        if (array[i] === value) {
+            return i;
+        }
+    }       
+// if value does not occur, return -1
+    return -1;
+};
 
 
 /** _.contains
@@ -113,6 +179,16 @@ var _ = {};
 *   _.contains([1,"two", 3.14], "two") -> true
 */
 
+// I: function takes an array and a value as inputs
+// O: function returns true if <array> contains <value>
+// otherise false
+// C: must use ternary (conditional) operator
+// E: (1) did you use === ? (2) what if no <value> is given *see output
+
+_.contains = function(array, value) {
+    
+    return array.includes(value) ? true : false;
+}
 
 /** _.each
 * Arguments:
@@ -130,6 +206,28 @@ var _ = {};
 *      -> should log "a" "b" "c" to the console
 */
 
+// I: function takes a collection and a function as inputs
+// O: function calls <function> with args determined by collection type
+// if array: function(collection[index], index, collection)
+// if object: function(collection.key.value, collection.key, collection)
+
+_.each = function(collection, func) {
+
+    if (Array.isArray(collection)) {
+        // if collection is an array
+        for (let index = 0; index < collection.length; index++) {
+            func(collection[index], index, collection);
+        }
+    } else if (typeof collection === 'object' && collection !== null) {
+        // if collection is an object
+        for (const key in collection) {
+            if (collection.hasOwnProperty(key)) {
+                func(collection[key], key, collection);
+            }
+        }
+    }
+}
+
 
 /** _.unique
 * Arguments:
@@ -141,6 +239,20 @@ var _ = {};
 *   _.unique([1,2,2,4,5,6,5,2]) -> [1,2,4,5,6]
 */
 
+// I: function takes an array as input
+// O: function returns an array with all elements from input array with duplicates removed
+// C: use indexOf from above
+
+_.unique = function(array) {
+
+    let newArray = [];
+        _.each(array, function(value) {
+            if (_.indexOf(newArray, value) === -1) {
+                newArray.push(value);
+            }
+        });
+        return newArray;
+}
 
 /** _.filter
 * Arguments:
@@ -157,7 +269,21 @@ var _ = {};
 * Extra Credit:
 *   use _.each in your implementation
 */
+// for .filter we iterate through an array and the purpose of the callback function is to test each item in the array
 
+_.filter = function(array, func){
+    const output = [];
+
+    for (let i = 0; i < array.length; i++) {
+        if (func(array[i], i, array) === true) {
+            output.push(array[i]);
+        }
+    }
+
+    return output;
+}
+
+// _.filter([1, 2, 3, 4], function(x){return x%2 === 0;});
 
 /** _.reject
 * Arguments:
@@ -171,6 +297,23 @@ var _ = {};
 * Examples:
 *   _.reject([1,2,3,4,5], function(e){return e%2 === 0}) -> [1,3,5]
 */
+
+// I: function takes an array and a function as inputs
+// O: function calls input <function> for each element in <array> passing the args: 
+// the element, its index, and <array>
+// returns new array of elements for which calling <function> returned false
+// logial inverse of _.filter()
+
+_.reject = function(array, func) {
+    let newArray = [];
+    for (let i = 0; i < array.length; i++) {
+        if (func(array[i], i, array) === false) {
+            newArray.push(array[i]);
+        }
+    }
+
+    return newArray;
+}
 
 
 /** _.partition
@@ -191,7 +334,25 @@ var _ = {};
 *   }); -> [[2,4],[1,3,5]]
 }
 */
+// I: functions takes an array and a function as inputs
+// O: functio calls <function> for each element in <array>, passing it the args:
+// element, key, array
+// C: returns an array made up of 2 sub arrays:
+// [0]: an array containing all values for which <function> returned something truthy
+// [1]: an array containing all values for which <function> returned something falsy
+// E: returns an array of arrays
 
+_.partition = function(array, func) {
+    let newArray = [[], []];
+    for (let i = 0; i < array.length; i++) {
+        if (func(array[i], i, array) === true) {
+            newArray[0].push(array[i]);
+        } else if (func(array[i], i, array) === false) {
+                newArray[1].push(array[i]);
+        }
+    }
+    return newArray;
+}
 
 /** _.map
 * Arguments:
@@ -209,6 +370,27 @@ var _ = {};
 *   _.map([1,2,3,4], function(e){return e * 2}) -> [2,4,6,8]
 */
 
+//mapping is any time you take an array and you invoke a callback function on each item in the array, and returning the items acted upon, in a new array
+// whether on an object or array, it takes it in, and it returns an array
+
+
+_.map = function(collection, func) {
+    const output = [];
+    if (Array.isArray(collection)) {
+        for (let i = 0; i < collection.length; i++) {
+            const result = func(collection[i], i, collection); 
+                output.push(result);
+            }
+    } else if (typeof collection === 'object' && collection !== null) {
+        for (const key in collection) {
+            if (collection.hasOwnProperty(key)) {
+               const result = func(collection[key], key, collection);
+                    output.push(result);
+            }
+        }
+    }
+    return output;
+}
 
 /** _.pluck
 * Arguments:
@@ -243,6 +425,30 @@ var _ = {};
 *   _.every([1,2,3], function(e){return e % 2 === 0}) -> false
 */
 
+// _.every = function(collection, func) {
+//     // if array
+//     if(Array.isArray(collection)) {
+//         // determine if func was not provided
+//         if (func === undefined) {
+//             for (let i = 0; i < collection.length; i++) {
+//                 if (!collection[i]) {
+//                     return false;
+//                 }
+//             }
+//         } else {
+//             for (let i = 0; i < collection.length; i++) {
+//                 if (func(collection[i]) === false) {
+//                     return false;
+//                 }
+//             }
+//         }
+//         } else { // it's an object
+//             if (func === undefined) {
+
+//             } else {
+//             }
+//     } 
+// }
 
 /** _.some
 * Arguments:
