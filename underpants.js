@@ -410,6 +410,7 @@ _.map = function(collection, func) {
 // we need to iterate over an array of objects, get the given property for every element in the array,
 // and return its value to a new array
 _.pluck = function(array, property) {
+    // which can all be done with _.map()
     return _.map(array, function(element) {
         return element[property];
     });
@@ -436,30 +437,41 @@ _.pluck = function(array, property) {
 *   _.every([1,2,3], function(e){return e % 2 === 0}) -> false
 */
 
-// _.every = function(collection, func) {
-//     // if array
-//     if(Array.isArray(collection)) {
-//         // determine if func was not provided
-//         if (func === undefined) {
-//             for (let i = 0; i < collection.length; i++) {
-//                 if (!collection[i]) {
-//                     return false;
-//                 }
-//             }
-//         } else {
-//             for (let i = 0; i < collection.length; i++) {
-//                 if (func(collection[i]) === false) {
-//                     return false;
-//                 }
-//             }
-//         }
-//         } else { // it's an object
-//             if (func === undefined) {
-
-//             } else {
-//             }
-//     } 
-// }
+_.every = function(collection, func) {
+    // if array
+    if(Array.isArray(collection)) {
+        // determine if func was not provided
+        if (func === undefined) {
+            for (let i = 0; i < collection.length; i++) {
+                if (!collection[i]) {
+                    return false;
+                }
+            }
+        } else {
+            for (let i = 0; i < collection.length; i++) {
+                if (!func(collection[i])) {
+                    return false;
+                }
+            }
+        }
+        } else {
+            // if object
+        if (func === undefined) {
+            for (let key in collection) {
+                if (!collection[key]) {
+                    return false;
+                }
+            }
+        } else {
+            for (let key in collection) {
+                if (!func(collection[key], key, collection)) {
+                        return false;
+                }
+            }
+        }
+    }
+    return true; 
+}
 
 /** _.some
 * Arguments:
@@ -481,6 +493,52 @@ _.pluck = function(array, property) {
 *   _.some([1,3,5], function(e){return e % 2 === 0}) -> false
 *   _.some([1,2,3], function(e){return e % 2 === 0}) -> true
 */
+// similar to every
+// I: collection and a function
+// O: call <function> for every element of <collection> with parameters determined by whether <collection> is array or object
+//  if array, params: current element, index, <collection>
+// if object, params: current value, current key, <collection>
+// return true if: return value of calling <function> is true for at least one element
+//  or <function> is not provided but at least one element is truthy
+// otherwise return false (if return val of calling <function> is false for all elements
+//  or <function> is not provided and no element is truthy)
+
+_.some = function(collection, func) {
+
+    if(Array.isArray(collection)) {
+        // determine if func was not provided
+        if (func === undefined) {
+            for (let i = 0; i < collection.length; i++) {
+                if (collection[i]) {
+                    return true;
+                }
+            }
+        } else {
+            for (let i = 0; i < collection.length; i++) {
+                if (func(collection[i])) {
+                    return true;
+                }
+            }
+        }
+        } else {
+            // if object
+        if (func === undefined) {
+            for (let key in collection) {
+                if (collection[key]) {
+                    return true;
+                }
+            }
+        } else {
+            for (let key in collection) {
+                if (func(collection[key], key, collection)) {
+                        return true;
+                }
+            }
+        }
+    }
+    return false; 
+}
+
 
 
 /** _.reduce
