@@ -271,17 +271,17 @@ _.unique = function(array) {
 */
 // for .filter we iterate through an array and the purpose of the callback function is to test each item in the array
 
-_.filter = function(array, func){
-    const output = [];
-
-    for (let i = 0; i < array.length; i++) {
-        if (func(array[i], i, array) === true) {
-            output.push(array[i]);
+_.filter = function(collection, test) {
+    const results = [];
+    
+    _.each(collection, function(element, indexOrKey, collection) {
+        if (test(element, indexOrKey, collection)) {
+            results.push(element);
         }
-    }
-
-    return output;
-}
+    });
+    
+    return results;
+};
 
 // _.filter([1, 2, 3, 4], function(x){return x%2 === 0;});
 
@@ -536,6 +536,7 @@ _.some = function(collection, func) {
             }
         }
     }
+    
     return false; 
 }
 
@@ -559,6 +560,27 @@ _.some = function(collection, func) {
 * Examples:
 *   _.reduce([1,2,3], function(previousSum, currentValue, currentIndex){ return previousSum + currentValue }, 0) -> 6
 */
+
+// I: function takes an array, a function, and a seed
+// O: function should 
+//  1) call <function> for every element in <collection> passing the arguments:
+//  previous result, element, index
+//  2) use return value of <function> as "previous result" for next iteration
+//  3) on rirst iteration, use <seed> as "previous result" 
+//  4) if no <seed> given, use first element/value of <collection> as <seed> and continue to next element
+//  5) after last iteration, return the return value of final <function> call
+
+_.reduce = function(array, func, seed) {
+    let noSeed = arguments.length < 3;
+    let result = noSeed ? array[0] : seed;
+    let start = noSeed ? 1 : 0;
+    
+    for (let i = start; i < array.length; i++) {
+        result = func(result, array[i], i);
+    }
+    
+    return result;
+};
 
 
 /** _.extend
