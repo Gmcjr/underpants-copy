@@ -403,6 +403,17 @@ _.map = function(collection, func) {
 *   _.pluck([{a: "one"}, {a: "two"}], "a") -> ["one", "two"]
 */
 
+// I: function takes an array of objects and a property
+// O: function returns an array containing the value of <property> for every element in <array>
+// C: must use _.map() in implementation
+
+// we need to iterate over an array of objects, get the given property for every element in the array,
+// and return its value to a new array
+_.pluck = function(array, property) {
+    return _.map(array, function(element) {
+        return element[property];
+    });
+};
 
 /** _.every
 * Arguments:
